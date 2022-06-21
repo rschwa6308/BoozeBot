@@ -7,4 +7,14 @@ export const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 	},
+
+	bigButton: {
+		alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 16,
+    elevation: 3,
+    backgroundColor: "blue",
+	},
 });
