@@ -1,25 +1,37 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import * as ScreenOrientation from "expo-screen-orientation";
 
-import * as ScreenOrientation from 'expo-screen-orientation';
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+import { HomeScreen } from "./screens/HomeScreen";
+import { MenuScreen } from "./screens/MenuScreen";
+import { ProgressScreen } from "./screens/ProgressScreen";
+import { AdminScreen } from "./screens/AdminScreen";
+
+
+// Root Stack pages
+export type RootStackParamList = {
+	Home: undefined;
+	Menu: undefined;
+	Progress: undefined;
+	Admin: undefined;
+}
+
+const RootStack = createNativeStackNavigator();
 
 
 export default function App() {
-  ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+	// force landscape
+	ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
 
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+	return (
+		<NavigationContainer>
+			<RootStack.Navigator>
+				<RootStack.Screen name="Home" component={HomeScreen} />
+				<RootStack.Screen name="Menu" component={MenuScreen} />
+				<RootStack.Screen name="Progress" component={ProgressScreen} />
+				<RootStack.Screen name="Admin" component={AdminScreen} />
+			</RootStack.Navigator>
+		</NavigationContainer>
+	);
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
