@@ -2,12 +2,12 @@
 // - https://www.informationisbeautiful.net/visualizations/cocktails-interactive/
 
 
-type ingredient = {
+export type ingredient = {
   name: string,
   color: string | null
 }
 
-type recipe = {
+export type recipe = {
   name: string,
   ingredients: Array<[ingredient, number]>
 }
