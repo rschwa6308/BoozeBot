@@ -40,7 +40,7 @@ export const INGREDIENTS = {
   },
   triple_sec: {
     name: "triple sec",
-    color: null
+    color: "#F5AC26"
   },
   simple_syrup: {
     name: "simple syrup",
@@ -48,7 +48,7 @@ export const INGREDIENTS = {
   },
   lime_juice: {
     name: "lime juice",
-    color: null
+    color: "#c6dba3"
   },
   lemon_juice: {
     name: "lemon juice",
@@ -60,7 +60,7 @@ export const INGREDIENTS = {
   },
   orange_juice: {
     name: "orange juice",
-    color: null
+    color: "#ffa500"
   },
   pineapple_juice: {
     name: "pineapple juice",
@@ -72,7 +72,7 @@ export const INGREDIENTS = {
   },
   cranberry_juice: {
     name: "cranberry juice",
-    color: null
+    color: "#ba4242"
   },
   club_soda: {
     name: "club soda",
@@ -96,6 +96,8 @@ export const INGREDIENTS = {
   }
 }
 
+
+// NOTE: for DrinkChart rendering, recipe ingredients listed in order from bottom up
 
 export const RECIPES: Array<recipe> = [
   {
