@@ -6,12 +6,13 @@ import type {RootStackParamList} from "../App";
 import SmoothPicker from "react-native-smooth-picker";
 
 import { styles } from "../styles";
-import { Box, Divider, FlatList, Heading, HStack, Pressable, ScrollView, Text, VStack } from "native-base";
+import { Box, Center, Divider, FlatList, Heading, HStack, Pressable, ScrollView, Slider, Text, VStack } from "native-base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ingredient, recipe, RECIPES } from "../recipes/recipes";
 import { PureComponent, useState } from "react";
 import { ListRenderItem, PressableProps } from "react-native";
-import { DrinkChart } from "../DrinkChart";
+import { DrinkChart } from "../CustomComponents/DrinkChart";
+import { CustomDrinkEditor } from "../CustomComponents/CustomDrinkEditor";
 
 
 interface DrinkCardProps {
@@ -36,7 +37,17 @@ class DrinkCard extends Component<DrinkCardProps> {
 					isFocused,
 					isPressed
 				}) => 
-					<Box bgColor={selected ? "red.400" : "gray.300"} borderRadius={16} margin={2} paddingX={2} paddingY={1} height={150}>
+					<Box
+						bgColor={selected ? "warmGray.100" : "warmGray.200"}	// TODO: mess with app bg color
+						// borderColor={selected ? "blue.200" : "warmGray.200"}
+						// borderWidth={2}
+						borderRadius={16}
+						marginY={2}
+						marginX={4}
+						paddingX={2} paddingY={1}
+						height={150}
+						shadow={selected ? 9 : -3}
+					>
 						<Text fontSize="xl" alignSelf="center">{drink.name}</Text>
 						<VStack space={0}>
 							{ingredientsItems}
@@ -54,13 +65,35 @@ class DrinkCard extends Component<DrinkCardProps> {
 
 
 
+function IngredientSlider() {
+	return (
+		<Slider defaultValue={70} minValue={0} maxValue={100} accessibilityLabel="hello world" step={10}>
+			<Slider.Track>
+				<Slider.FilledTrack />
+			</Slider.Track>
+			<Slider.Thumb />
+		</Slider>
+	)
+}
+
+
+
+
+const deepCopy = (obj: Object) => JSON.parse(JSON.stringify(obj))
+
+
+
 export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootStackParamList, "Menu"> ) {
 
-	const [selectedIndex, setSelectedIndex] = useState(0);
+	const [selectedRecipeIndex, setSelectedRecipeIndex] = useState(0);
+	const [customDrink, setCustomDrink] = useState(deepCopy(RECIPES[0]))
 
 	const renderDrinkCard: ListRenderItem<recipe> = function({ item, index }) {
 		return (
-			<DrinkCard drink={item} selected={index === selectedIndex} onPressAction={() => setSelectedIndex(index)}/>
+			<DrinkCard drink={item} selected={index === selectedRecipeIndex} onPressAction={() => {
+				setSelectedRecipeIndex(index)
+				setCustomDrink(deepCopy(RECIPES[index]))
+			}}/>
 		)
 	}
 
@@ -69,16 +102,16 @@ export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootSta
 			<HStack height="100%">
 				<FlatList
 					data={RECIPES}
-					extraData={selectedIndex}
+					extraData={selectedRecipeIndex}
 					renderItem={renderDrinkCard}
 					keyExtractor={(item, index) => item.name + index}
 					flex={1}
 				/>
 				<Divider orientation="vertical"/>
 				<Box flex={3}>
-					<VStack alignItems="center">
-						<Heading>{RECIPES[selectedIndex].name}</Heading>
-						<DrinkChart ingredients={RECIPES[selectedIndex].ingredients} height={350} width={250}/>
+					<VStack alignItems="center" space={4}>
+						<Heading>{customDrink.name}</Heading>
+						{CustomDrinkEditor(customDrink)}
 					</VStack>
 				</Box>
 			</HStack>
