@@ -97,6 +97,15 @@ export const INGREDIENTS = {
 }
 
 
+export const INGREDIENT_LOOKUP = (ingName: string) => {
+	for (const ing in INGREDIENTS) {
+		if (INGREDIENTS[ing].name == ingName) {
+			return INGREDIENTS[ing]
+		}
+	}
+}
+
+
 // NOTE: for DrinkChart rendering, recipe ingredients listed in order from bottom up
 
 export const RECIPES: Array<recipe> = [

@@ -4,7 +4,9 @@ import { DrinkChart } from "./DrinkChart";
 import { ingredient, recipe, RECIPES } from "../recipes/recipes";
 
 
-function IngredientSlider() {
+const IngredientSlider: React.FC<{ing: ingredient}> = ({
+	ing
+}) => {
 	return (
 		<Slider
 			size="md"
@@ -12,6 +14,7 @@ function IngredientSlider() {
 			minValue={0} maxValue={100}
 			step={10}
 			defaultValue={70}
+			key={ing.name}
 		>
 			<Slider.Track>
 				<Slider.FilledTrack />
@@ -23,18 +26,16 @@ function IngredientSlider() {
 
 
 
-export function CustomDrinkEditor(drink: recipe) {
-	var totalParts = 0
-	drink.ingredients.forEach(item => {
-		totalParts += item[1]
-	});
-
+export const CustomDrinkEditor: React.FC<{drink: recipe}> = ({
+	drink
+}) => {
 	return (
-	<HStack space={10}>
-		<DrinkChart ingredients={drink.ingredients} height={350} width={225}/>
-		<VStack alignItems="center" w="300" space={8}>
-			{drink.ingredients.map(ing => <IngredientSlider/>)}
-		</VStack>
-	</HStack>
-	)
+		<HStack space={16}>
+			<DrinkChart ingredients={drink.ingredients} height={350} width={225}/>
+			<VStack alignItems="center" w="300" space={8}>
+				{drink.ingredients.map(([ing, parts]) => <IngredientSlider ing={ing}/>)}
+			</VStack>
+		</HStack>
+		)
 }
+

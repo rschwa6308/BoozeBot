@@ -31,29 +31,23 @@ class DrinkCard extends Component<DrinkCardProps> {
 		)
 
 		return (
-			<Pressable onPress={onPressAction}>
-				{({
-					isHovered,
-					isFocused,
-					isPressed
-				}) => 
+			<Pressable onPress={onPressAction} key={drink.name}>
 					<Box
 						bgColor={selected ? "warmGray.100" : "warmGray.200"}	// TODO: mess with app bg color
-						// borderColor={selected ? "blue.200" : "warmGray.200"}
-						// borderWidth={2}
+						// borderColor={selected ? "primary.300" : "transparent"}
+						// borderWidth={3}
 						borderRadius={16}
 						marginY={2}
 						marginX={4}
 						paddingX={2} paddingY={1}
 						height={150}
-						shadow={selected ? 9 : -3}
+						shadow={selected ? 9 : -5}
 					>
 						<Text fontSize="xl" alignSelf="center">{drink.name}</Text>
 						<VStack space={0}>
 							{ingredientsItems}
 						</VStack>
 					</Box>
-				}
 			</Pressable>
 		)
 	}
@@ -65,16 +59,6 @@ class DrinkCard extends Component<DrinkCardProps> {
 
 
 
-function IngredientSlider() {
-	return (
-		<Slider defaultValue={70} minValue={0} maxValue={100} accessibilityLabel="hello world" step={10}>
-			<Slider.Track>
-				<Slider.FilledTrack />
-			</Slider.Track>
-			<Slider.Thumb />
-		</Slider>
-	)
-}
 
 
 
@@ -86,7 +70,7 @@ const deepCopy = (obj: Object) => JSON.parse(JSON.stringify(obj))
 export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootStackParamList, "Menu"> ) {
 
 	const [selectedRecipeIndex, setSelectedRecipeIndex] = useState(0);
-	const [customDrink, setCustomDrink] = useState(deepCopy(RECIPES[0]))
+	const [customDrink, setCustomDrink] = useState<recipe>(deepCopy(RECIPES[0]))
 
 	const renderDrinkCard: ListRenderItem<recipe> = function({ item, index }) {
 		return (
@@ -109,9 +93,9 @@ export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootSta
 				/>
 				<Divider orientation="vertical"/>
 				<Box flex={3}>
-					<VStack alignItems="center" space={4}>
+					<VStack alignItems="center" space={6}>
 						<Heading>{customDrink.name}</Heading>
-						{CustomDrinkEditor(customDrink)}
+						<CustomDrinkEditor drink={customDrink}/>
 					</VStack>
 				</Box>
 			</HStack>
