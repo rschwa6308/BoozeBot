@@ -27,11 +27,11 @@ class DrinkCard extends Component<DrinkCardProps> {
 		const { drink, selected, onPressAction } = this.props;
 
 		const ingredientsItems = drink.ingredients.map(a =>
-			<Text fontSize="sm">- {a[0].name}</Text>
+			<Text fontSize="sm" color={selected ? "warmGray.1000" : "warmGray.800"}>- {a[0].name}</Text>
 		)
 
 		return (
-			<Pressable onPress={onPressAction} key={drink.name}>
+			<Pressable onPress={onPressAction} key={JSON.stringify(drink).substring(0, 100)}>
 					<Box
 						bgColor={selected ? "warmGray.100" : "warmGray.200"}	// TODO: mess with app bg color
 						// borderColor={selected ? "primary.300" : "transparent"}
@@ -43,7 +43,7 @@ class DrinkCard extends Component<DrinkCardProps> {
 						height={150}
 						shadow={selected ? 9 : -5}
 					>
-						<Text fontSize="xl" alignSelf="center">{drink.name}</Text>
+						<Text fontSize="xl" alignSelf="center" color={selected ? "warmGray.1000" : "warmGray.800"}>{drink.name}</Text>
 						<VStack space={0}>
 							{ingredientsItems}
 						</VStack>
@@ -90,10 +90,11 @@ export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootSta
 					renderItem={renderDrinkCard}
 					keyExtractor={(item, index) => item.name + index}
 					flex={1}
+					paddingTop={2}
 				/>
 				<Divider orientation="vertical"/>
 				<Box flex={3}>
-					<VStack alignItems="center" space={6}>
+					<VStack alignItems="center" space={6} paddingTop={2}>
 						<Heading>{customDrink.name}</Heading>
 						<CustomDrinkEditor drink={customDrink}/>
 					</VStack>

@@ -42,6 +42,7 @@ export function HomeScreen({ route, navigation }: NativeStackScreenProps<RootSta
               <Icon as={MaterialCommunityIcons} name="glass-cocktail" size={79} color="white"/>
             </HStack>
           </TouchableOpacity>
+          <Button title="Bluetooth Setup" onPress={() => navigation.navigate("BluetoothSetup")}/>
         </VStack>
       </Center>
 			

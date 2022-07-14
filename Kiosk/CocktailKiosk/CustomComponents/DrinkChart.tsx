@@ -7,7 +7,7 @@ interface DrinkChartProps {
 	ingredients: Array<[ingredient, number]>,
 }
 
-const GLASS_RADIUS = 25
+const GLASS_RADIUS = 30
 
 
 
@@ -17,7 +17,7 @@ export function DrinkChart( props: DrinkChartProps & InterfaceVStackProps ) {
 		var item = props.ingredients[i]
 		// console.log(i, item)
 		layers.push(
-			<Center flex={item[1]} bgColor={item[0].color} key={item[0].name} borderBottomRadius={i > 0 ? 0 : GLASS_RADIUS}>
+			<Center flex={item[1]} bgColor={item[0].color} key={item[0].name} borderBottomRadius={i > 0 ? 0 : GLASS_RADIUS - 3}>
 				<Text color={(getYIQ(item[0].color) >= 128) ? "black" : "white"}>{item[0].name}</Text>
 			</Center>
 		)
@@ -30,7 +30,14 @@ export function DrinkChart( props: DrinkChartProps & InterfaceVStackProps ) {
 
 
 	return (
-		<VStack {...props} borderWidth={1} borderBottomRadius={GLASS_RADIUS}>
+		<VStack
+			{...props}
+			borderWidth={3}
+			borderTopWidth={0}
+			borderBottomRadius={GLASS_RADIUS}
+			borderColor="warmGray.600"
+		>
+			<Box height={3}/>
 			{layers}
 		</VStack>
 	)

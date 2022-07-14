@@ -7,28 +7,35 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ProgressScreen } from "./screens/ProgressScreen";
 import { AdminScreen } from "./screens/AdminScreen";
+import { BluetoothSetupScreen } from "./screens/BluetoothSetupScreen";
+
 import { NativeBaseProvider } from "native-base";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ingredient } from "./recipes/recipes";
 import { IngredientConfigContext } from "./IngredientConfigContext";
+import { StatusBar } from "react-native";
+import { BLEApp } from "./ble-manager-example";
+// import { BleManager } from "react-native-ble-manager/BleManager"
+
 
 
 // Root Stack pages
 export type RootStackParamList = {
-	Home: undefined;
-	Menu: undefined;
-	Progress: undefined;
-	Admin: undefined;
+	Home: undefined
+	Menu: undefined
+	Progress: undefined
+	Admin: undefined
+	BluetoothSetup: undefined
 }
 
 const RootStack = createNativeStackNavigator();
 
 
 
+
+
 export default function App() {
-	// force landscape
-	ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
 
 	const [ingredientA, setIngredientA] = useState<ingredient | null>(null)
 	const [ingredientB, setIngredientB] = useState<ingredient | null>(null)
@@ -36,6 +43,18 @@ export default function App() {
 	const [ingredientD, setIngredientD] = useState<ingredient | null>(null)
 	const [ingredientE, setIngredientE] = useState<ingredient | null>(null)
 	const [ingredientF, setIngredientF] = useState<ingredient | null>(null)
+
+	// const [bluetoothIsEnabled, setBluetoothIsEnabled] = useState<boolean>(false)
+	// const [isScanning, setIsScanning] = useState<boolean>(false)
+
+	useEffect(() => {
+		// force landscape
+		ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE)
+
+		// hide status bar
+		StatusBar.setHidden(true)
+	}, [])
+
 
 	return (
 		<NativeBaseProvider>
@@ -54,6 +73,7 @@ export default function App() {
 							<RootStack.Screen name="Menu" component={MenuScreen} />
 							<RootStack.Screen name="Progress" component={ProgressScreen} />
 							<RootStack.Screen name="Admin" component={AdminScreen} />
+							<RootStack.Screen name="BluetoothSetup" component={BluetoothSetupScreen} />
 						</RootStack.Navigator>
 					</NavigationContainer>
 				</IngredientConfigContext.Provider>
