@@ -1,5 +1,5 @@
-import { Text, View, Button, Pressable, TouchableOpacity } from "react-native";
-import { Box, Center, Flex, IconButton, Icon, InfoIcon, VStack, HStack, Heading } from "native-base";
+import { View, Button, Pressable, TouchableOpacity } from "react-native";
+import { Box, Center, Flex, IconButton, Icon, InfoIcon, VStack, HStack, Text, Heading } from "native-base";
 
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type {RootStackParamList} from "../App";
@@ -35,7 +35,8 @@ export function HomeScreen({ route, navigation }: NativeStackScreenProps<RootSta
 			/>
       <Center flex={1}>
         <VStack alignItems="center" space={10}>
-          <Heading size="3xl">Cocktail Machine</Heading>
+          <Heading size="3xl" fontFamily="heading" fontStyle="italic">Cocktail Machine</Heading>
+          <Text fontFamily="body" fontWeight={600} fontStyle="italic">Hello World</Text>
           <TouchableOpacity style={styles.bigButton} onPress={() => navigation.navigate("Menu")}>
             <HStack alignItems="center" space={6}>
               <Heading size="4xl" color="white">START!</Heading>
