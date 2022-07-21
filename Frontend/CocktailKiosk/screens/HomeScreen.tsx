@@ -35,15 +35,14 @@ export function HomeScreen({ route, navigation }: NativeStackScreenProps<RootSta
 			/>
       <Center flex={1}>
         <VStack alignItems="center" space={10}>
-          <Heading size="3xl" fontFamily="heading" fontStyle="italic">Cocktail Machine</Heading>
-          <Text fontFamily="body" fontWeight={600} fontStyle="italic">Hello World</Text>
+          <Heading size="3xl">Cocktail Machine</Heading>
           <TouchableOpacity style={styles.bigButton} onPress={() => navigation.navigate("Menu")}>
             <HStack alignItems="center" space={6}>
               <Heading size="4xl" color="white">START!</Heading>
               <Icon as={MaterialCommunityIcons} name="glass-cocktail" size={79} color="white"/>
             </HStack>
           </TouchableOpacity>
-          <Button title="Bluetooth Setup" onPress={() => navigation.navigate("BluetoothSetup")}/>
+          <Button title="Bluetooth Debug" onPress={() => navigation.navigate("BluetoothDebug")}/>
         </VStack>
       </Center>
 			

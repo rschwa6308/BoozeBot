@@ -27,7 +27,12 @@ class DrinkCard extends Component<DrinkCardProps> {
 		const { drink, selected, onPressAction } = this.props;
 
 		const ingredientsItems = drink.ingredients.map(a =>
-			<Text fontFamily="body" fontSize="sm" color={selected ? "warmGray.900" : "warmGray.700"}>- {a[0].name}</Text>
+			<Text
+				fontFamily="body"
+				fontSize="sm"
+				color={selected ? "warmGray.900" : "warmGray.700"}
+				// style={{"fontWeight": "300"}}
+			>- {a[0].name}</Text>
 		)
 
 		return (
@@ -44,8 +49,7 @@ class DrinkCard extends Component<DrinkCardProps> {
 						shadow={selected ? 9 : -5}
 					>
 						<Text
-							fontFamily="body"
-							fontStyle="italic"
+							style={{"fontFamily": "Baskerville-Italic"}}
 							fontSize="xl"
 							alignSelf="center"
 							color={selected ? "warmGray.900" : "warmGray.700"}
@@ -102,7 +106,7 @@ export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootSta
 				<Divider orientation="vertical"/>
 				<Box flex={3}>
 					<VStack alignItems="center" space={6} paddingTop={2}>
-						<Heading size="xl" italic={true}>{customDrink.name}</Heading>
+						<Heading size="2xl" style={{"fontFamily": "Baskerville-Italic"}}>{customDrink.name}</Heading>
 						<CustomDrinkEditor drink={customDrink}/>
 					</VStack>
 				</Box>

@@ -8,8 +8,7 @@ import { Box, Text, Heading, HStack, Select, VStack, Button, Switch } from "nati
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ingredient, INGREDIENTS, INGREDIENT_LOOKUP } from "../recipes/recipes";
 import { useContext, useState } from "react";
-import React from "react";
-import { IngredientConfigContext } from "../IngredientConfigContext";
+import { AppContext } from "../AppContext";
 import { getYIQ } from "../utils";
 
 
@@ -24,8 +23,8 @@ const ControlUnit: React.FC<ControlUnitProps> = ({
 	title,
 	ingredientValue,
 	ingredientSetter
-}) => {
-	const ingredientConfig = useContext(IngredientConfigContext)
+}: ControlUnitProps) => {
+	const ingredientConfig = useContext(AppContext)
 
 	return (
 		<VStack borderWidth={1} borderRadius={16} padding={4} space={4} borderColor="warmGray.400">
@@ -71,7 +70,7 @@ export function AdminScreen({ route, navigation }: NativeStackScreenProps<RootSt
 		ingredientD, setIngredientD,
 		ingredientE, setIngredientE,
 		ingredientF, setIngredientF,
-	} = useContext(IngredientConfigContext)
+	} = useContext(AppContext)
 
 	return (
 		<SafeAreaView>

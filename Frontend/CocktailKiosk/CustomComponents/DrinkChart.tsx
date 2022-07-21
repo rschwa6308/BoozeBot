@@ -17,8 +17,18 @@ export function DrinkChart( props: DrinkChartProps & InterfaceVStackProps ) {
 		var item = props.ingredients[i]
 		// console.log(i, item)
 		layers.push(
-			<Center flex={item[1]} bgColor={item[0].color} key={item[0].name} borderBottomRadius={i > 0 ? 0 : GLASS_RADIUS - 3}>
-				<Text color={(getYIQ(item[0].color) >= 128) ? "black" : "white"}>{item[0].name}</Text>
+			<Center
+				flex={item[1]}
+				bgColor={item[0].color}
+				key={item[0].name}
+				borderBottomRadius={i > 0 ? 0 : GLASS_RADIUS - 3}
+				minHeight={1}
+			>
+				<Text
+					color={(getYIQ(item[0].color) >= 128) ? "black" : "white"}
+					style={{"fontWeight": "300", "textTransform": "capitalize"}}
+					fontSize={"md"}
+				>{item[0].name}</Text>
 			</Center>
 		)
 		// if (i > 0) {
@@ -32,7 +42,7 @@ export function DrinkChart( props: DrinkChartProps & InterfaceVStackProps ) {
 	return (
 		<VStack
 			{...props}
-			borderWidth={3}
+			borderWidth={2}
 			borderTopWidth={0}
 			borderBottomRadius={GLASS_RADIUS}
 			borderColor="warmGray.600"

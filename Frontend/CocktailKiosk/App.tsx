@@ -7,20 +7,22 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ProgressScreen } from "./screens/ProgressScreen";
 import { AdminScreen } from "./screens/AdminScreen";
-import { BluetoothSetupScreen } from "./screens/BluetoothSetupScreen";
+import { BluetoothDebugScreen } from "./screens/BluetoothDebugScreen";
 
 import { NativeBaseProvider } from "native-base";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import React, { useContext, useEffect, useState } from "react";
 import { ingredient } from "./recipes/recipes";
-import { IngredientConfigContext } from "./IngredientConfigContext";
+import { AppContext } from "./AppContext";
 import { StatusBar } from "react-native";
 import { theme } from "./theme"
-import { BLEApp } from "./ble-manager-example";
+// import { BLEApp } from "./ble-manager-example";
 // import { BleManager } from "react-native-ble-manager/BleManager"
 
 import AppLoading from "expo-app-loading";
 import { useFonts } from "expo-font";
+
+import { BluetoothManager } from "./BluetoothManager";
 
 
 
@@ -30,7 +32,7 @@ export type RootStackParamList = {
 	Menu: undefined
 	Progress: undefined
 	Admin: undefined
-	BluetoothSetup: undefined
+	BluetoothDebug: undefined
 }
 
 const RootStack = createNativeStackNavigator();
@@ -41,6 +43,7 @@ const customFonts = {
   "Baskerville-Regular": require("./assets/fonts/Libre_Baskerville/LibreBaskerville-Regular.ttf"),
   "Baskerville-Italic": require("./assets/fonts/Libre_Baskerville/LibreBaskerville-Italic.ttf"),
   "Baskerville-Bold": require("./assets/fonts/Libre_Baskerville/LibreBaskerville-Bold.ttf"),
+  "Baskerville-BoldItalic": require("./assets/fonts/Baskerville_Bold_Italic/Baskerville_Bold_Italic.otf"),
 };
 
 
@@ -54,8 +57,7 @@ export default function App() {
 	const [ingredientE, setIngredientE] = useState<ingredient | null>(null)
 	const [ingredientF, setIngredientF] = useState<ingredient | null>(null)
 
-	// const [bluetoothIsEnabled, setBluetoothIsEnabled] = useState<boolean>(false)
-	// const [isScanning, setIsScanning] = useState<boolean>(false)
+	const [BTManager, _] = useState(new BluetoothManager())
 
 	useEffect(() => {
 		// force landscape
@@ -63,6 +65,9 @@ export default function App() {
 
 		// hide status bar
 		StatusBar.setHidden(true)
+
+		// initialize bluetooth manager
+		BTManager.initialize()
 	}, [])
 
 	// load fonts
@@ -76,13 +81,14 @@ export default function App() {
 		return (
 			<NativeBaseProvider theme={theme}>
 				<SafeAreaProvider>
-					<IngredientConfigContext.Provider value={{
+					<AppContext.Provider value={{
 						ingredientA, setIngredientA,
 						ingredientB, setIngredientB,
 						ingredientC, setIngredientC,
 						ingredientD, setIngredientD,
 						ingredientE, setIngredientE,
 						ingredientF, setIngredientF,
+						BTManager
 					}}>
 						<NavigationContainer>
 							<RootStack.Navigator screenOptions={{ headerShown: false }}>
@@ -90,10 +96,10 @@ export default function App() {
 								<RootStack.Screen name="Menu" component={MenuScreen} />
 								<RootStack.Screen name="Progress" component={ProgressScreen} />
 								<RootStack.Screen name="Admin" component={AdminScreen} />
-								<RootStack.Screen name="BluetoothSetup" component={BluetoothSetupScreen} />
+								<RootStack.Screen name="BluetoothDebug" component={BluetoothDebugScreen} />
 							</RootStack.Navigator>
 						</NavigationContainer>
-					</IngredientConfigContext.Provider>
+					</AppContext.Provider>
 				</SafeAreaProvider>
 			</NativeBaseProvider>
 		);
