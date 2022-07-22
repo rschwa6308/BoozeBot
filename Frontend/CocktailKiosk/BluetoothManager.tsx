@@ -75,12 +75,22 @@ export class BluetoothManager {
   }
 
   refreshAvailableDevices() {
-    return BluetoothSerial.list().then((devices: Array<device>) => {
+    return BluetoothSerial.list()
+    .then((devices: Array<device>) => {
       this.devices = devices
     })
   }
 
   availableDevices() {
     return this.devices;
+  }
+
+  sendMessage(message: string) {
+    BluetoothSerial.write(message)
+    .then((res: any) => {
+      console.log("Message sent: " + message)
+    }).catch((err: any) => {
+      Toast.show({description: err})
+    })
   }
 }

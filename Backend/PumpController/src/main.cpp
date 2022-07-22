@@ -37,8 +37,12 @@ uint8_t getRelayChannelPin(int channel) {
 }
 
 
+bool greenButtonPressed;
+bool redButtonPressed;
+
 bool greenButtonOld;
 bool redButtonOld;
+
 
 int activePumpNumber;
 
@@ -73,57 +77,58 @@ void setup() {
 }
 
 
+
+void handleButtons() {
+	// TODO: create a queue for button input events
+
+	greenButtonPressed = digitalRead(GREEN_BUTTON) == LOW;
+	redButtonPressed = digitalRead(RED_BUTTON) == LOW;
+	
+	if (!greenButtonOld && greenButtonPressed) {
+		Serial.print("GREEN BUTTON DOWN\n");
+		// digitalWrite(GREEN_LED, HIGH);
+	}
+
+	if (greenButtonOld && !greenButtonPressed) {
+		Serial.print("GREEN BUTTON UP\n");
+		// digitalWrite(GREEN_LED, LOW);
+	}
+
+	if (!redButtonOld && redButtonPressed) {
+		Serial.print("RED BUTTON DOWN\n");
+		// digitalWrite(RED_LED, HIGH);
+	}
+
+	if (redButtonOld && !redButtonPressed) {
+		Serial.print("RED BUTTON UP\n");
+	}
+
+	greenButtonOld = greenButtonPressed;
+	redButtonOld = redButtonPressed;
+}
+
+
+
+void handleMessage(String* msg_ptr) {
+	String msg = *msg_ptr;
+	Serial.printf("Received a message of length %d: \"%s\"\n", msg.length(), msg);
+}
+
+
+
 void loop() {
 
-	// if (digitalRead(GREEN_BUTTON) == LOW) {
-	// 	digitalWrite(GREEN_LED, HIGH);
-	// 	Serial.println("GREEN BUTTON PRESSED");
-	// } else {
-	// 	digitalWrite(GREEN_LED, LOW);
-	// }
-
-	// Serial.println("GREEN BUTTON: " + digitalRead(GREEN_BUTTON));
-	// Serial.println("RED BUTTON: " + digitalRead(RED_BUTTON));
-
-	bool greenButtonNew = digitalRead(GREEN_BUTTON) == LOW;
-	bool redButtonNew = digitalRead(RED_BUTTON) == LOW;
+	handleButtons();
 	
-	if (!greenButtonOld && greenButtonNew) {
-		Serial.print("GREEN BUTTON DOWN\n");
-
-		digitalWrite(GREEN_LED, HIGH);
-		digitalWrite(getRelayChannelPin(activePumpNumber), HIGH);
-	}
-
-	if (greenButtonOld && !greenButtonNew) {
-		Serial.print("GREEN BUTTON UP\n");
-
-		digitalWrite(GREEN_LED, LOW);
-		digitalWrite(getRelayChannelPin(activePumpNumber), LOW);
-	}
-
-	if (!redButtonOld && redButtonNew) {
-		Serial.print("RED BUTTON DOWN\n");
-
-		digitalWrite(RED_LED, HIGH);
-	}
-
-	if (redButtonOld && !redButtonNew) {
-		Serial.print("RED BUTTON UP\n");
-
-		digitalWrite(RED_LED, LOW);
-
-		activePumpNumber++;
-		if (activePumpNumber > 6) {
-			activePumpNumber = 1;
-		}
-		Serial.printf("Controlling Pump %d\n", activePumpNumber);
-	}
-
-	greenButtonOld = greenButtonNew;
-	redButtonOld = redButtonNew;
-
 	loopBT();		// step the bluetooth loop function
+
+	// if there is a message waiting, consume and handle it
+	if (messageWaitingBT()) {
+		String* msg_ptr = getMessageBT();
+		handleMessage(msg_ptr);
+	}
 
 	delay(50);
 }
+
+

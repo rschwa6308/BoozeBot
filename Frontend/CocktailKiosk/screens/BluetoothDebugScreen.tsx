@@ -28,14 +28,14 @@ export function BluetoothDebugScreen({ route, navigation }: NativeStackScreenPro
   const [dummy, setDummy] = useState(false)
 
   // TODO: get this page to update whenever the bluetooth status changes
-  useEffect(() => {
-    setInterval(() => setDummy(!dummy), 10_000);
-  })
+  // useEffect(() => {
+  //   setInterval(() => setDummy(!dummy), 10_000);
+  // })
 
 	return (
 		<SafeAreaView>
       <VStack padding={2} space={10}>
-        <Text>Dummy: {dummy ? "A" : "B"}</Text>
+        {/* <Text>Dummy: {dummy ? "A" : "B"}</Text> */}
 			  <Heading alignSelf="center">Bluetooth Debug</Heading>
         <HStack>
           <Text fontSize="xl" style={{"fontWeight": "bold"}} width={225}>Connection Status:</Text>
@@ -67,14 +67,17 @@ export function BluetoothDebugScreen({ route, navigation }: NativeStackScreenPro
             {BTManager.availableDevices().map((dev: device) => 
               <TouchableOpacity style={{"backgroundColor": "#FFFFFF", "borderRadius": 8, "padding": 8}} key={dev.id} onPress={() => BTManager.connect(dev)}>
                   <HStack justifyContent="space-between">
-                    <Text fontSize="xl">"{dev.name}"</Text>
+                    <Text fontSize="xl">{dev.name}</Text>
                     <Text fontSize="xl" color="muted.400">{dev == BTManager.connectionStatus().device ? "Connected" : "Not Connected"}</Text>
                 </HStack>
               </TouchableOpacity>
             )}
-            <Text alignSelf="center" fontSize="4xl">. . .</Text>
+            <Text alignSelf="center" fontSize="4xl" color="white">. . .</Text>
           </ScrollView>
         </HStack>
+        <Button onPress={() => BTManager.sendMessage("Hello, World;")}>
+          <Text>Send Test Message</Text>
+        </Button>
       </VStack>
 		</SafeAreaView>
 	);
