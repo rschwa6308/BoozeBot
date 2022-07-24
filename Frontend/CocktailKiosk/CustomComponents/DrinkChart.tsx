@@ -1,34 +1,52 @@
-import { Box, Center, Divider, Text, VStack } from "native-base";
+import { Box, Button, Center, Divider, Text, VStack } from "native-base";
 import { InterfaceVStackProps } from "native-base/lib/typescript/components/primitives/Stack/VStack";
-import { ingredient } from "../recipes/recipes";
+import { useEffect, useState } from "react";
+import { ingredient, recipe } from "../recipes/recipes";
 import { getYIQ } from "../utils";
 
-interface DrinkChartProps {
-	ingredients: Array<[ingredient, number]>,
-}
+
 
 const GLASS_RADIUS = 30
 
 
+// class 
 
-export function DrinkChart( props: DrinkChartProps & InterfaceVStackProps ) {
+
+export const DrinkChart: React.FC<{drink: recipe} & InterfaceVStackProps> = ({
+	drink,
+	...props
+}) => {
+
+	
+  // force a page update every half second by constantly updating a dummy state variable to a new value
+  const [dummy, setDummy] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => setDummy(Date.now()), 500);   // grab current time
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+	const presentIngredients = drink.ingredients.filter(([ing, parts]) => parts > 0)
+
 	var layers = []
-	for (var i = props.ingredients.length - 1; i >= 0; i--) {
-		var item = props.ingredients[i]
+	for (var i = presentIngredients.length - 1; i >= 0; i--) {
+		const [ing, parts] = presentIngredients[i]
+
 		// console.log(i, item)
 		layers.push(
 			<Center
-				flex={item[1]}
-				bgColor={item[0].color}
-				key={item[0].name}
+				flex={parts}
+				bgColor={ing.color}
+				key={ing.name}
 				borderBottomRadius={i > 0 ? 0 : GLASS_RADIUS - 3}
-				minHeight={1}
+				minHeight={4}
 			>
 				<Text
-					color={(getYIQ(item[0].color) >= 128) ? "black" : "white"}
+					color={(getYIQ(ing.color) >= 128) ? "black" : "white"}
 					style={{"fontWeight": "300", "textTransform": "capitalize"}}
 					fontSize={"md"}
-				>{item[0].name}</Text>
+				>{ing.name}</Text>
 			</Center>
 		)
 		// if (i > 0) {
@@ -46,6 +64,7 @@ export function DrinkChart( props: DrinkChartProps & InterfaceVStackProps ) {
 			borderTopWidth={0}
 			borderBottomRadius={GLASS_RADIUS}
 			borderColor="warmGray.600"
+			key={drink}
 		>
 			<Box height={3}/>
 			{layers}

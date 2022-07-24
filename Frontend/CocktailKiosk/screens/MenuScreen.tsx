@@ -13,6 +13,7 @@ import { PureComponent, useState } from "react";
 import { ListRenderItem, PressableProps } from "react-native";
 import { DrinkChart } from "../CustomComponents/DrinkChart";
 import { CustomDrinkEditor } from "../CustomComponents/CustomDrinkEditor";
+import { deepCopy } from "../utils";
 
 
 interface DrinkCardProps {
@@ -32,6 +33,7 @@ class DrinkCard extends Component<DrinkCardProps> {
 				fontSize="sm"
 				color={selected ? "warmGray.900" : "warmGray.700"}
 				// style={{"fontWeight": "300"}}
+				key={a[0].name}
 			>- {a[0].name}</Text>
 		)
 
@@ -70,11 +72,6 @@ class DrinkCard extends Component<DrinkCardProps> {
 
 
 
-
-
-
-
-const deepCopy = (obj: Object) => JSON.parse(JSON.stringify(obj))
 
 
 

@@ -7,3 +7,7 @@ export function getYIQ(hexcolor: string){
 	var yiq = ((r*299) + (g*587) + (b*114)) / 1000
 	return yiq
 }
+
+export function deepCopy(obj: Object) {
+	return JSON.parse(JSON.stringify(obj))
+}

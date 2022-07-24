@@ -25,25 +25,27 @@ export function BluetoothDebugScreen({ route, navigation }: NativeStackScreenPro
   const { BTManager } = useContext(AppContext)
 
   const [refreshing, setRefreshing] = useState(false);
-  const [dummy, setDummy] = useState(false)
 
-  // TODO: get this page to update whenever the bluetooth status changes
-  // useEffect(() => {
-  //   setInterval(() => setDummy(!dummy), 10_000);
-  // })
+  // force a page update every second by constantly updating a dummy state variable to a new value
+  const [dummy, setDummy] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => setDummy(Date.now()), 1000);   // grab current time
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
 	return (
 		<SafeAreaView>
       <VStack padding={2} space={10}>
-        {/* <Text>Dummy: {dummy ? "A" : "B"}</Text> */}
 			  <Heading alignSelf="center">Bluetooth Debug</Heading>
         <HStack>
           <Text fontSize="xl" style={{"fontWeight": "bold"}} width={225}>Connection Status:</Text>
-          <Text fontSize="xl">{BTManager.connected ? "✅ CONNECTED ✅" : "❌ NOT CONNECTED ❌"}</Text>            
+          <Text fontSize="xl">{BTManager.connected ? "✔️ CONNECTED ✔️" : "❌ NOT CONNECTED ❌"}</Text>            
         </HStack>
         <HStack>
           <Text fontSize="xl" style={{"fontWeight": "bold"}} width={225}>Connected Device:</Text>
-          <Text fontSize="xl">{BTManager.device == null ? "NONE" : `\"${BTManager.device.name}\"\n${BTManager.device.id}`}</Text>            
+          <Text fontSize="xl">{BTManager.device == null ? "NONE\n" : `\"${BTManager.device.name}\"\n${BTManager.device.id}`}</Text>            
         </HStack>
 
         <HStack>
@@ -54,6 +56,8 @@ export function BluetoothDebugScreen({ route, navigation }: NativeStackScreenPro
             borderWidth={0}
             bgColor="warmGray.300"
             padding={4}
+            showsVerticalScrollIndicator={true}
+            persistentScrollbar={true}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
@@ -75,9 +79,9 @@ export function BluetoothDebugScreen({ route, navigation }: NativeStackScreenPro
             <Text alignSelf="center" fontSize="4xl" color="white">. . .</Text>
           </ScrollView>
         </HStack>
-        <Button onPress={() => BTManager.sendMessage("Hello, World;")}>
+        {/* <Button onPress={() => BTManager.sendMessage("Hello, World;")}>
           <Text>Send Test Message</Text>
-        </Button>
+        </Button> */}
       </VStack>
 		</SafeAreaView>
 	);
