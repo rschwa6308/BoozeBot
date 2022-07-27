@@ -4,6 +4,8 @@ import { Toast } from "native-base"
 import BluetoothSerial from "react-native-bluetooth-serial"
 
 
+const EOT_CHAR = ";"
+
 
 export type device = { id: string, name: string }
 
@@ -85,8 +87,14 @@ export class BluetoothManager {
     return this.devices;
   }
 
-  sendMessage(message: string) {
-    BluetoothSerial.write(message)
+  sendMessage(message_object: Object) {
+    const message = JSON.stringify(message_object)
+
+    if (message.includes(EOT_CHAR)) {
+      console.warn(`WARNING: message should not include EOT character \"%{EOT_CHAR}\"`)
+    }
+
+    BluetoothSerial.write(message + EOT_CHAR)
     .then((res: any) => {
       console.log("Message sent: " + message)
     }).catch((err: any) => {

@@ -17,14 +17,16 @@ interface ControlUnitProps {
 	title: string
 	ingredientValue: ingredient | null
 	ingredientSetter: (ing: ingredient | null) => void
+	pumpNumber: number
 }
 
 const ControlUnit: React.FC<ControlUnitProps> = ({
 	title,
 	ingredientValue,
-	ingredientSetter
+	ingredientSetter,
+	pumpNumber
 }: ControlUnitProps) => {
-	const ingredientConfig = useContext(AppContext)
+	const { BTManager } = useContext(AppContext)
 
 	return (
 		<VStack borderWidth={1} borderRadius={16} padding={4} space={4} borderColor="warmGray.400">
@@ -52,7 +54,13 @@ const ControlUnit: React.FC<ControlUnitProps> = ({
 			</HStack>
 			<HStack alignItems="center" justifyContent="space-between">
 				<Text fontSize="md">Pump</Text>
-				<Switch size="lg"/>
+				<Switch size="lg" onValueChange={(on: boolean) => BTManager.sendMessage({
+					message_type: "signal_manual_control",
+					message_content: {
+						pump_number: pumpNumber,
+						state: on
+					}
+				})}/>
 			</HStack>
 		</VStack>
 	)
@@ -76,14 +84,14 @@ export function AdminScreen({ route, navigation }: NativeStackScreenProps<RootSt
 		<SafeAreaView>
 			<VStack width="100%" height="100%" justifyContent="space-evenly">
 				<HStack justifyContent="space-evenly">
-					<ControlUnit title="Slot A" ingredientValue={ingredientA} ingredientSetter={setIngredientA}/>
-					<ControlUnit title="Slot B" ingredientValue={ingredientB} ingredientSetter={setIngredientB}/>
-					<ControlUnit title="Slot C" ingredientValue={ingredientC} ingredientSetter={setIngredientC}/>
+					<ControlUnit title="Slot A" ingredientValue={ingredientA} ingredientSetter={setIngredientA} pumpNumber={1}/>
+					<ControlUnit title="Slot B" ingredientValue={ingredientB} ingredientSetter={setIngredientB} pumpNumber={2}/>
+					<ControlUnit title="Slot C" ingredientValue={ingredientC} ingredientSetter={setIngredientC} pumpNumber={3}/>
 				</HStack>
 				<HStack justifyContent="space-evenly">
-					<ControlUnit title="Slot D" ingredientValue={ingredientD} ingredientSetter={setIngredientD}/>
-					<ControlUnit title="Slot E" ingredientValue={ingredientE} ingredientSetter={setIngredientE}/>
-					<ControlUnit title="Slot F" ingredientValue={ingredientF} ingredientSetter={setIngredientF}/>
+					<ControlUnit title="Slot D" ingredientValue={ingredientD} ingredientSetter={setIngredientD} pumpNumber={4}/>
+					<ControlUnit title="Slot E" ingredientValue={ingredientE} ingredientSetter={setIngredientE} pumpNumber={5}/>
+					<ControlUnit title="Slot F" ingredientValue={ingredientF} ingredientSetter={setIngredientF} pumpNumber={6}/>
 				</HStack>
 			</VStack>
 		</SafeAreaView>

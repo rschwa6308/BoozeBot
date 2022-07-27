@@ -17,7 +17,8 @@ BluetoothSerial SerialBT;
 
 
 cppQueue charBuffer(sizeof(char), MAX_MESSAGE_LENGTH, FIFO, true);
-cppQueue messageQueue(sizeof(String*), MESSAGE_QUEUE_SIZE, FIFO, true);
+cppQueue messageQueue(sizeof(char*), MESSAGE_QUEUE_SIZE, FIFO, true);
+
 
 
 // designed to be called once in main `setup()`
@@ -33,7 +34,6 @@ void loopBT() {
 	if (SerialBT.available()) {
 		char rcv = (char) SerialBT.read();
 		if (rcv != -1) {
-			// Serial.print(rcv);
 			charBuffer.push(&rcv);
 		}
 	}
@@ -43,13 +43,16 @@ void loopBT() {
 		char c;
 		charBuffer.peekPrevious(&c);	// look at last entry in the buffer
 		if (c == EOT_CHAR) {
-			String msg;
+			char* msg = (char*) malloc(sizeof(char) * charBuffer.getRemainingCount());
+			int i = 0;
 			while (charBuffer.pop(&c)) {
-				msg += c;
-				Serial.println(msg);
+				msg[i] = c;
+				i++;
 			}
-			Serial.printf("msg_ptr from loopBT(): %d\n", &msg);
-			messageQueue.push(&msg);
+			msg[i-1] = '\0';			// overwrite EOT character with null terminator
+			Serial.println(msg);
+			char** msg_ptr = &msg;
+			messageQueue.push(&msg_ptr);
 		}
 	}
 }
@@ -60,16 +63,8 @@ boolean messageWaitingBT() {
 }
 
 
-String* getMessageBT() {
-	String* msg_ptr;
-	bool res = messageQueue.pop(&msg_ptr);
-	if (res) {
-		Serial.println("messageQueue.pop() succeeded!");
-	} else {
-		Serial.println("messageQueue.pop() failed!");
-	}
-
-	// TODO: figure out why the message string pointer is changing
-	Serial.printf("msg_ptr from getMessageBT(): %d\n", msg_ptr);
+char** getMessageBT() {
+	char** msg_ptr;
+	messageQueue.pop(&msg_ptr);
 	return msg_ptr;
 }

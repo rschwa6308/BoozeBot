@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <ArduinoJson.h>
+
 #include "bluetooth.h"
 
 
@@ -14,6 +16,9 @@
 #define RELAY_CHANNEL_4 18
 #define RELAY_CHANNEL_5 17	// "UART 2 TX"
 #define RELAY_CHANNEL_6 16	// "UART 2 RX"
+
+
+#define PUMP_SPEED 2.5		// pump flow rate (measured in mL/s)
 
 
 uint8_t getRelayChannelPin(int channel) {
@@ -44,7 +49,9 @@ bool greenButtonOld;
 bool redButtonOld;
 
 
-int activePumpNumber;
+bool currentlyHandlingOrder;	// flag that indicates if an order is currently being handled
+long currentOrderStartTime;		// time that the current order started (measured in milliseconds)
+int currentOrder[6];			// array that keeps track of how long each pump should be run (measured in milliseconds)
 
 
 void setup() {
@@ -64,11 +71,6 @@ void setup() {
 	pinMode(RELAY_CHANNEL_4, OUTPUT);
 	pinMode(RELAY_CHANNEL_5, OUTPUT);
 	pinMode(RELAY_CHANNEL_6, OUTPUT);
-
-	greenButtonOld = false;
-	redButtonOld = false;
-
-	activePumpNumber = 1;
 
 	digitalWrite(GREEN_LED, LOW);
 	digitalWrite(RED_LED, LOW);
@@ -109,26 +111,108 @@ void handleButtons() {
 
 
 
-void handleMessage(String* msg_ptr) {
-	String msg = *msg_ptr;
-	Serial.printf("Received a message of length %d: \"%s\"\n", msg.length(), msg);
+void handleMessage(char* msg) {
+	// Serial.printf("handleMessage(\"%s\")\n", msg);
+
+	// if an order is currently in progress, ignore all incoming messages
+	if (currentlyHandlingOrder) {
+		return;
+	}
+
+	DynamicJsonDocument doc(1024);
+	deserializeJson(doc, msg);
+
+	const char* msg_type = doc["message_type"];
+	// Serial.printf("message_type = \"%s\"\n", msg_type);
+
+	if (strcmp(msg_type, "signal_order_start") == 0) {
+		const int ingredientAmounts[6] = {
+			doc["message_content"]["ingredient_amounts"][0],
+			doc["message_content"]["ingredient_amounts"][1],
+			doc["message_content"]["ingredient_amounts"][2],
+			doc["message_content"]["ingredient_amounts"][3],
+			doc["message_content"]["ingredient_amounts"][4],
+			doc["message_content"]["ingredient_amounts"][5]
+		};
+
+		currentlyHandlingOrder = true;
+		currentOrderStartTime = millis();	// note the time that the order started
+
+		for (int i = 0; i < 6; i++) {
+			// compute how long each pump needs to stay on
+			currentOrder[i] = 1000 * ingredientAmounts[i] / PUMP_SPEED;
+
+			// turn on pumps that have work to do
+			if (currentOrder[i] > 0) {
+				Serial.printf("Running pump #%d for %d seconds...\n", i+1, currentOrder[i]/1000);
+				digitalWrite(getRelayChannelPin(i + 1), HIGH);
+			}
+		}
+	}
+	
+	else if (strcmp(msg_type, "signal_manual_control") == 0) {
+		const int pumpNumber = doc["message_content"]["pump_number"];
+		const bool newState = doc["message_content"]["state"];
+
+		Serial.printf("Manual Control Signal: turning pump #%d %s\n", pumpNumber, newState ? "ON" : "OFF");
+		digitalWrite(getRelayChannelPin(pumpNumber), newState ? HIGH : LOW);
+	}
+	
+	else {
+		Serial.printf("WARNING: unknown message type: %s\n", msg_type);
+	}
+}
+
+
+
+void handleOrder() {
+	if (!currentlyHandlingOrder) {
+		return;		// NoOp
+	}
+
+	long elapsed = millis() - currentOrderStartTime;
+
+	bool orderFinished = true;
+
+	for (int i = 0; i < 6; i++) {
+		if (currentOrder[i] == 0) {
+			continue;
+		}
+
+		orderFinished = false;
+
+		// if pump has run for long enough, turn it off
+		if (elapsed >= currentOrder[i]) {
+			currentOrder[i] = 0;
+			Serial.printf("Turning off pump #%d\n", i+1);
+			digitalWrite(getRelayChannelPin(i+1), LOW);
+		}
+	}
+
+	if (orderFinished) {
+		Serial.println("ORDER FINISHED!!!");
+		currentlyHandlingOrder = false;
+		// TODO: send notification to kiosk
+	}
 }
 
 
 
 void loop() {
 
-	handleButtons();
+	handleButtons();	// step the button-handling loop
 	
-	loopBT();		// step the bluetooth loop function
+	loopBT();			// step the bluetooth loop
 
+	handleOrder();		// step the order-handling loop
+	
 	// if there is a message waiting, consume and handle it
 	if (messageWaitingBT()) {
-		String* msg_ptr = getMessageBT();
-		handleMessage(msg_ptr);
+		char** msg_ptr = getMessageBT();
+		handleMessage(*msg_ptr);
 	}
 
-	delay(50);
+	delay(10);			// wait a few milliseconds
 }
 
 

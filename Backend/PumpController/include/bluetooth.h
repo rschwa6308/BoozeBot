@@ -6,4 +6,4 @@ void loopBT();
 
 boolean messageWaitingBT();
 
-String* getMessageBT();
+char** getMessageBT();

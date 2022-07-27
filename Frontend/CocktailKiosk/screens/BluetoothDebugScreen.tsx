@@ -38,7 +38,7 @@ export function BluetoothDebugScreen({ route, navigation }: NativeStackScreenPro
 	return (
 		<SafeAreaView>
       <VStack padding={2} space={10}>
-			  <Heading alignSelf="center">Bluetooth Debug</Heading>
+			  <Heading alignSelf="center">Bluetooth Status</Heading>
         <HStack>
           <Text fontSize="xl" style={{"fontWeight": "bold"}} width={225}>Connection Status:</Text>
           <Text fontSize="xl">{BTManager.connected ? "✔️ CONNECTED ✔️" : "❌ NOT CONNECTED ❌"}</Text>            
@@ -79,9 +79,14 @@ export function BluetoothDebugScreen({ route, navigation }: NativeStackScreenPro
             <Text alignSelf="center" fontSize="4xl" color="white">. . .</Text>
           </ScrollView>
         </HStack>
-        {/* <Button onPress={() => BTManager.sendMessage("Hello, World;")}>
+        <Button onPress={() => BTManager.sendMessage({
+          message_type: "signal_order_start",
+          message_content: {
+            ingredient_amounts: [10, 0, 15, 0, 0, 0]
+          }
+        })}>
           <Text>Send Test Message</Text>
-        </Button> */}
+        </Button>
       </VStack>
 		</SafeAreaView>
 	);
