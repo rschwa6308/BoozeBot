@@ -70,7 +70,7 @@ const ControlUnit: React.FC<ControlUnitProps> = ({
 
 
 
-export function AdminScreen({ route, navigation }: NativeStackScreenProps<RootStackParamList, "Admin"> ) {
+export function AdminPumpsScreen({ route, navigation }: NativeStackScreenProps<RootStackParamList, "AdminPumps"> ) {
 	const {
 		ingredientA, setIngredientA,
 		ingredientB, setIngredientB,

@@ -6,11 +6,11 @@ import type {RootStackParamList} from "../App";
 import SmoothPicker from "react-native-smooth-picker";
 
 import { styles } from "../styles";
-import { Box, Center, Divider, FlatList, Heading, HStack, Pressable, ScrollView, Slider, Text, VStack } from "native-base";
+import { Badge, Box, Center, Divider, FlatList, Heading, HStack, Pressable, ScrollView, Slider, Text, VStack } from "native-base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ingredient, recipe, RECIPES } from "../recipes/recipes";
 import { PureComponent, useState } from "react";
-import { ListRenderItem, PressableProps } from "react-native";
+import { ListRenderItem, PressableProps, TouchableOpacity } from "react-native";
 import { DrinkChart } from "../CustomComponents/DrinkChart";
 import { CustomDrinkEditor } from "../CustomComponents/CustomDrinkEditor";
 import { deepCopy } from "../utils";
@@ -47,7 +47,7 @@ class DrinkCard extends Component<DrinkCardProps> {
 						marginY={2}
 						marginX={4}
 						paddingX={2} paddingY={1}
-						height={150}
+						height={140}
 						shadow={selected ? 9 : -5}
 					>
 						<Text
@@ -72,6 +72,57 @@ class DrinkCard extends Component<DrinkCardProps> {
 
 
 
+class SizeButton extends Component<{text: string, subText: string, selected: boolean, onPressAction: CallableFunction, recommended: boolean}> {
+	render() {
+		const { text, subText, selected, onPressAction, recommended } = this.props
+		return (
+			<Pressable
+				bgColor={selected ? "warmGray.100" : "warmGray.200"}
+				shadow={selected ? 3 : -5}
+				width={150} height={45}
+				alignItems="center" justifyContent="center"
+				borderRadius={16}
+				onPress={() => {
+					onPressAction()
+					this.forceUpdate()	// TODO: fix bug where shadow disappears 
+				}}
+			>
+				{recommended ? <Badge variant="subtle" colorScheme="info" rounded="full" position="absolute" right={-6} top={-6}>★</Badge> : null}
+				<Text fontSize="md" style={{"fontWeight": "300"}} color="black">{text}</Text>
+				<Text fontSize="xs" style={{"fontWeight": "300"}} color="warmGray.500">{subText}</Text>
+			</Pressable>
+		)
+	}
+
+	// shouldComponentUpdate(nextProps) {
+	// 	return this.props.selected != nextProps.selected
+	// }
+}
+
+
+// const SizeButton: React.FC<{text: string, subText: string, selected: boolean, onPressAction: PressableProps["onPress"], recommended: boolean}> = ({
+// 	text,
+// 	subText,
+// 	selected,
+// 	onPressAction,
+// 	recommended
+// }) => {
+// 	return (
+// 		<Pressable
+// 			bgColor={selected ? "warmGray.100" : "warmGray.200"}
+// 			shadow={selected ? 3 : -5}
+// 			width={150} height={45}
+// 			alignItems="center" justifyContent="center"
+// 			borderRadius={16}
+// 			onPress={onPressAction}
+// 		>
+// 			{recommended ? <Badge variant="subtle" colorScheme="info" rounded="full" position="absolute" right={-6} top={-6}>★</Badge> : null}
+// 			<Text fontSize="md" style={{"fontWeight": "300"}} color="black">{text}</Text>
+// 			<Text fontSize="xs" style={{"fontWeight": "300"}} color="warmGray.500">{subText}</Text>
+// 		</Pressable>
+// 	)
+// }
+
 
 
 
@@ -79,6 +130,7 @@ export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootSta
 
 	const [selectedRecipeIndex, setSelectedRecipeIndex] = useState(0);
 	const [customDrink, setCustomDrink] = useState<recipe>(deepCopy(RECIPES[0]))
+	const [size, setSize] = useState("medium");
 
 	const renderDrinkCard: ListRenderItem<recipe> = function({ item, index }) {
 		return (
@@ -105,6 +157,32 @@ export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootSta
 					<VStack alignItems="center" space={6} paddingTop={2}>
 						<Heading size="2xl" style={{"fontFamily": "Baskerville-Italic"}}>{customDrink.name}</Heading>
 						<CustomDrinkEditor drink={customDrink}/>
+						<HStack space={6} alignItems="center" marginTop={2}>
+							<SizeButton
+								text="small" subText="75mL"
+								selected={size=="small"}
+								onPressAction={() => setSize("small")}
+								recommended={customDrink.recommendedSize == "small"}
+							/>
+							<SizeButton
+								text="medium" subText="150mL"
+								selected={size=="medium"}
+								onPressAction={() => setSize("medium")}
+								recommended={customDrink.recommendedSize == "medium"}
+							/>
+							<SizeButton
+								text="large" subText="250mL"
+								selected={size=="large"}
+								onPressAction={() => setSize("large")} 
+								recommended={customDrink.recommendedSize == "large"}
+							/>
+						</HStack>
+						{customDrink.recommendedSize != null ?
+							<HStack position="absolute" left={1} bottom={-6} alignItems="center">
+								<Badge variant="subtle" colorScheme="info" rounded="full">★</Badge>
+								<Text fontSize="xs" style={{"fontWeight": "300"}} color="warmGray.500"> = recommended</Text>
+							</HStack>
+						 : null}
 					</VStack>
 				</Box>
 			</HStack>

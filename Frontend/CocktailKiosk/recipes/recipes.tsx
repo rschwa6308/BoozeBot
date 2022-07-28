@@ -9,7 +9,8 @@ export type ingredient = {
 
 export type recipe = {
 	name: string,
-	ingredients: Array<[ingredient, number]>
+	ingredients: Array<[ingredient, number]>,
+	recommendedSize: null | "small" | "medium" | "large"
 }
 
 
@@ -116,7 +117,8 @@ export const RECIPES: Array<recipe> = [
 			[INGREDIENTS.cranberry_juice, 3],
 			[INGREDIENTS.lime_juice, 1.5],
 			[INGREDIENTS.triple_sec, 1.5]
-		]
+		],
+		recommendedSize: "medium"
 	},
 	{
 		name: "Kamikaze",
@@ -124,7 +126,8 @@ export const RECIPES: Array<recipe> = [
 			[INGREDIENTS.vodka, 1],
 			[INGREDIENTS.lime_juice, 1],
 			[INGREDIENTS.triple_sec, 1]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "Lemon Drop",
@@ -132,14 +135,16 @@ export const RECIPES: Array<recipe> = [
 			[INGREDIENTS.vodka, 2.5],
 			[INGREDIENTS.triple_sec, 2],
 			[INGREDIENTS.lemon_juice, 1.5]
-		]
+		],
+		recommendedSize: "small"
 	},
 	{
 		name: "Screwdriver",
 		ingredients: [
 			[INGREDIENTS.vodka, 1],
 			[INGREDIENTS.orange_juice, 2]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "Moscow Mule",
@@ -147,7 +152,8 @@ export const RECIPES: Array<recipe> = [
 			[INGREDIENTS.ginger_beer, 12],
 			[INGREDIENTS.vodka, 4.5],
 			[INGREDIENTS.lime_juice, 0.5]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "Margarita",
@@ -155,7 +161,8 @@ export const RECIPES: Array<recipe> = [
 			[INGREDIENTS.tequila, 3.5],
 			[INGREDIENTS.triple_sec, 2],
 			[INGREDIENTS.lime_juice, 1.5]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "Tequila Sunrise",
@@ -163,14 +170,16 @@ export const RECIPES: Array<recipe> = [
 			[INGREDIENTS.orange_juice, 6],
 			[INGREDIENTS.tequila, 3],
 			[INGREDIENTS.grenadine, 1]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "Dark 'N' Stormy",
 		ingredients: [
 			[INGREDIENTS.ginger_beer, 5],
 			[INGREDIENTS.dark_rum, 3]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "Cuba Libre",
@@ -178,7 +187,8 @@ export const RECIPES: Array<recipe> = [
 			[INGREDIENTS.cola, 6],
 			[INGREDIENTS.white_rum, 2.5],
 			[INGREDIENTS.lime_juice, 0.5]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "Bacardi",
@@ -186,7 +196,8 @@ export const RECIPES: Array<recipe> = [
 			[INGREDIENTS.white_rum, 4.5],
 			[INGREDIENTS.lime_juice, 2],
 			[INGREDIENTS.grenadine, 1]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "Daiquiri",
@@ -194,7 +205,8 @@ export const RECIPES: Array<recipe> = [
 			[INGREDIENTS.white_rum, 4.5],
 			[INGREDIENTS.lime_juice, 2.5],
 			[INGREDIENTS.simple_syrup, 1.5]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "White Lady",
@@ -202,7 +214,8 @@ export const RECIPES: Array<recipe> = [
 			[INGREDIENTS.gin, 2],
 			[INGREDIENTS.triple_sec, 1.5],
 			[INGREDIENTS.lemon_juice, 1]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "Gin Fizz",
@@ -211,7 +224,8 @@ export const RECIPES: Array<recipe> = [
 			[INGREDIENTS.lemon_juice, 3],
 			[INGREDIENTS.simple_syrup, 1],
 			[INGREDIENTS.club_soda, 8]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "John Collins",
@@ -220,28 +234,32 @@ export const RECIPES: Array<recipe> = [
 			[INGREDIENTS.gin, 3],
 			[INGREDIENTS.lemon_juice, 2],
 			[INGREDIENTS.simple_syrup, 1]
-		]
+		],
+		recommendedSize: "large"
 	},
 	{
 		name: "Rum & Coke",
 		ingredients: [
 			[INGREDIENTS.white_rum, 2],
 			[INGREDIENTS.cola, 5]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "Rum & Coke",
 		ingredients: [
 			[INGREDIENTS.dark_rum, 2],
 			[INGREDIENTS.cola, 5]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "Vodka Soda",
 		ingredients: [
 			[INGREDIENTS.vodka, 1],
 			[INGREDIENTS.club_soda, 2]
-		]
+		],
+		recommendedSize: null
 	},
 	{
 		name: "Old Fashioned",
@@ -249,6 +267,7 @@ export const RECIPES: Array<recipe> = [
 			[INGREDIENTS.whiskey, 8],
 			[INGREDIENTS.simple_syrup, 1],
 			[INGREDIENTS.bitters, 0.5]
-		]
+		],
+		recommendedSize: "small"
 	}
 ]

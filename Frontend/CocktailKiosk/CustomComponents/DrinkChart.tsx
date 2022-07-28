@@ -33,6 +33,12 @@ export const DrinkChart: React.FC<{drink: recipe} & InterfaceVStackProps> = ({
 	for (var i = presentIngredients.length - 1; i >= 0; i--) {
 		const [ing, parts] = presentIngredients[i]
 
+		if (i == presentIngredients.length - 1 && getYIQ(ing.color) >= 210) {
+			layers.push(
+				<Divider height="1px" bgColor="warmGray.200"/>
+			)
+		}
+
 		// console.log(i, item)
 		layers.push(
 			<Center
@@ -45,7 +51,7 @@ export const DrinkChart: React.FC<{drink: recipe} & InterfaceVStackProps> = ({
 				<Text
 					color={(getYIQ(ing.color) >= 128) ? "black" : "white"}
 					style={{"fontWeight": "300", "textTransform": "capitalize"}}
-					fontSize={"md"}
+					fontSize="md"
 				>{ing.name}</Text>
 			</Center>
 		)
@@ -64,7 +70,6 @@ export const DrinkChart: React.FC<{drink: recipe} & InterfaceVStackProps> = ({
 			borderTopWidth={0}
 			borderBottomRadius={GLASS_RADIUS}
 			borderColor="warmGray.600"
-			key={drink}
 		>
 			<Box height={3}/>
 			{layers}

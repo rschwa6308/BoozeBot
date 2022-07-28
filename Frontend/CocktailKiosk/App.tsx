@@ -1,26 +1,27 @@
+import React, { useContext, useEffect, useState } from "react";
 import * as ScreenOrientation from "expo-screen-orientation";
+import AppLoading from "expo-app-loading";
+import { useFonts } from "expo-font";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import { NativeBaseProvider } from "native-base";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+
 import { HomeScreen } from "./screens/HomeScreen";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ProgressScreen } from "./screens/ProgressScreen";
-import { AdminScreen } from "./screens/AdminScreen";
-import { BluetoothDebugScreen } from "./screens/BluetoothDebugScreen";
+import { AdminMenuScreen } from "./screens/AdminMenuScreen";
+import { AdminPumpsScreen } from "./screens/AdminPumpsScreen";
+import { AdminBluetoothScreen } from "./screens/AdminBluetoothScreen";
 
-import { NativeBaseProvider } from "native-base";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import React, { useContext, useEffect, useState } from "react";
 import { ingredient } from "./recipes/recipes";
 import { AppContext } from "./AppContext";
 import { StatusBar } from "react-native";
 import { theme } from "./theme"
-// import { BLEApp } from "./ble-manager-example";
-// import { BleManager } from "react-native-ble-manager/BleManager"
 
-import AppLoading from "expo-app-loading";
-import { useFonts } from "expo-font";
+
 
 import { BluetoothManager } from "./BluetoothManager";
 
@@ -31,8 +32,9 @@ export type RootStackParamList = {
 	Home: undefined
 	Menu: undefined
 	Progress: undefined
-	Admin: undefined
-	BluetoothDebug: undefined
+	AdminMenu: undefined
+	AdminPumps: undefined
+	AdminBluetooth: undefined
 }
 
 const RootStack = createNativeStackNavigator();
@@ -95,8 +97,9 @@ export default function App() {
 								<RootStack.Screen name="Home" component={HomeScreen} />
 								<RootStack.Screen name="Menu" component={MenuScreen} />
 								<RootStack.Screen name="Progress" component={ProgressScreen} />
-								<RootStack.Screen name="Admin" component={AdminScreen} />
-								<RootStack.Screen name="BluetoothDebug" component={BluetoothDebugScreen} />
+								<RootStack.Screen name="AdminMenu" component={AdminMenuScreen} />
+								<RootStack.Screen name="AdminPumps" component={AdminPumpsScreen} />
+								<RootStack.Screen name="AdminBluetooth" component={AdminBluetoothScreen} />
 							</RootStack.Navigator>
 						</NavigationContainer>
 					</AppContext.Provider>

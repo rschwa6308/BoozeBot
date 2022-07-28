@@ -21,7 +21,7 @@ const stringify = (obj: Object) => JSON.stringify(obj, null, 2)
 
 
 
-export function BluetoothDebugScreen({ route, navigation }: NativeStackScreenProps<RootStackParamList, "BluetoothDebug"> ) {
+export function AdminBluetoothScreen({ route, navigation }: NativeStackScreenProps<RootStackParamList, "AdminBluetooth"> ) {
   const { BTManager } = useContext(AppContext)
 
   const [refreshing, setRefreshing] = useState(false);
