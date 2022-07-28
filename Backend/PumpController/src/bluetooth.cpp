@@ -31,19 +31,19 @@ void setupBT() {
 // designed to be called once every loop in main `loop()`
 void loopBT() {
 	// add incoming chars to the buffer
-	if (SerialBT.available()) {
+	// stop after consuming a set number to avoid blocking main loop
+	int chars_read = 0;
+	while (SerialBT.available() && chars_read < 64) {
 		char rcv = (char) SerialBT.read();
 		if (rcv != -1) {
 			charBuffer.push(&rcv);
+			chars_read++;
 		}
-	}
 
-	// if EOT is received, flush the buffer to a string and add to message queue
-	if (!charBuffer.isEmpty()) {
-		char c;
-		charBuffer.peekPrevious(&c);	// look at last entry in the buffer
-		if (c == EOT_CHAR) {
+		// if EOT is received, flush the buffer to a string and add to message queue
+		if (rcv == EOT_CHAR) {
 			char* msg = (char*) malloc(sizeof(char) * charBuffer.getRemainingCount());
+			char c;
 			int i = 0;
 			while (charBuffer.pop(&c)) {
 				msg[i] = c;
@@ -55,6 +55,7 @@ void loopBT() {
 			messageQueue.push(&msg_ptr);
 		}
 	}
+
 }
 
 
