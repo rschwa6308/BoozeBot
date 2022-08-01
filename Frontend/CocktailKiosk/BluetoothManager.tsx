@@ -9,6 +9,13 @@ const EOT_CHAR = ";"
 
 export type device = { id: string, name: string }
 
+
+export const PUMP_CONTROLLER_DEVICE: device = {
+  name: "PumpController (ESP32)",
+  id: "0C:DC:7E:62:7C:B2"
+}
+
+
 export class BluetoothManager {
   isEnabled: boolean
   devices: Array<device>
@@ -16,12 +23,22 @@ export class BluetoothManager {
   connecting: boolean
   device: device | null
 
+  onRequestOrderStart: CallableFunction
+  onNotifyOrderStarted: CallableFunction
+  onNotifyOrderFinished: CallableFunction
+  onNotifyOrderCanceled: CallableFunction
+
   constructor() {
     this.isEnabled = false
     this.devices = []
     this.connected = false
     this.connecting = false
     this.device = null
+
+    this.onRequestOrderStart = () => {}
+    this.onNotifyOrderStarted = () => {}
+    this.onNotifyOrderFinished = () => {}
+    this.onNotifyOrderCanceled = () => {}
   }
 
   initialize() {
@@ -52,8 +69,10 @@ export class BluetoothManager {
     })
     
     BluetoothSerial.on("read", (msg: any) => {
-      // console.log(msg)
+      console.log("Received from PumpController: " + msg.data.trim())
       Toast.show({description: `Message received from device:\n\n\"${msg.data.trim()}\"`})
+
+      this.handleMessage(JSON.parse(msg.data.trim().slice(0, -1)))
     })
   }
 
@@ -67,6 +86,9 @@ export class BluetoothManager {
       this.connected = true
     })
     .catch((err: any) => Toast.show({description: err.message}))
+    .finally(() => {
+      this.connecting = false
+    })
   }
 
   connectionStatus() {
@@ -100,5 +122,29 @@ export class BluetoothManager {
     }).catch((err: any) => {
       Toast.show({description: err})
     })
+  }
+
+  handleMessage(message: any) {
+    switch (message.message_type) {
+      case "request_order_start":
+        this.onRequestOrderStart()
+        break;
+      
+        case "notify_order_started":
+          this.onNotifyOrderStarted()
+          break;
+        
+        case "notify_order_finished":
+        this.onNotifyOrderFinished()
+        break;
+      
+        case "notify_order_canceled":
+          this.onNotifyOrderCanceled()
+          break;
+        
+        default:
+          console.log("WARNING: received message with unknown type: " + JSON.stringify(message))
+    }
+    
   }
 }

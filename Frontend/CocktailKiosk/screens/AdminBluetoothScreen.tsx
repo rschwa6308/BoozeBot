@@ -10,10 +10,6 @@ import { device } from "../BluetoothManager";
 import { RefreshControl, TouchableOpacity } from "react-native";
 
 
-const PUMP_CONTROLLER_DEVICE = {
-  name: "PumpController (ESP32)",
-  id: "0C:DC:7E:62:7C:B2"
-}
 
 const stringify = (obj: Object) => JSON.stringify(obj, null, 2)
 

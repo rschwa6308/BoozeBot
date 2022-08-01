@@ -23,7 +23,7 @@ import { theme } from "./theme"
 
 
 
-import { BluetoothManager } from "./BluetoothManager";
+import { BluetoothManager, PUMP_CONTROLLER_DEVICE } from "./BluetoothManager";
 
 
 
@@ -71,6 +71,17 @@ export default function App() {
 		// initialize bluetooth manager
 		BTManager.initialize()
 	}, [])
+
+	// ensure bluetooth connection every few seconds
+	// TODO: figure out why this isn't actually running
+	useEffect(() => {
+    const interval = setInterval(() => {
+			if (!(BTManager.connected || BTManager.connecting)) {
+				// console.log("Attempting to connect")
+				BTManager.connect(PUMP_CONTROLLER_DEVICE)
+			}
+		}, 5000);
+  }, []);
 
 	// load fonts
 	let [fontsLoaded] = useFonts(customFonts);

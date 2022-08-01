@@ -34,8 +34,8 @@ export function HomeScreen({ route, navigation }: NativeStackScreenProps<RootSta
         onPress={() => navigation.navigate("AdminMenu")}
 			/>
       <Center flex={1}>
-        <VStack alignItems="center" space={100}>
-          <Heading size="3xl" style={{"fontFamily": "Baskerville-Bold"}}>Cocktail Machine</Heading>
+        <VStack alignItems="center" space={90}>
+          <Heading size="4xl" style={{"fontFamily": "Baskerville-Bold"}}>BoozeBot 3000</Heading>
           <TouchableOpacity style={styles.bigButton} onPress={() => navigation.navigate("Menu")}>
             <HStack alignItems="center" space={6}>
               <Heading size="4xl" color="white">START!</Heading>

@@ -88,7 +88,14 @@ void handleButtons() {
 	
 	if (!greenButtonOld && greenButtonPressed) {
 		Serial.print("GREEN BUTTON DOWN\n");
+		
 		// digitalWrite(GREEN_LED, HIGH);
+		
+		// send REQUEST_ORDER_START message
+		DynamicJsonDocument doc(1024);
+		doc["message_type"] = "request_order_start";
+		doc["message_content"] = "";	// no content
+		sendStructuredMessageBT(doc);
 	}
 
 	if (greenButtonOld && !greenButtonPressed) {
@@ -161,6 +168,8 @@ void handleMessage(char* msg) {
 	else {
 		Serial.printf("WARNING: unknown message type: %s\n", msg_type);
 	}
+
+	free(msg);		// no memory leaks pls
 }
 
 

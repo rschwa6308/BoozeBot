@@ -55,7 +55,6 @@ void loopBT() {
 			messageQueue.push(&msg_ptr);
 		}
 	}
-
 }
 
 
@@ -68,4 +67,33 @@ char** getMessageBT() {
 	char** msg_ptr;
 	messageQueue.pop(&msg_ptr);
 	return msg_ptr;
+}
+
+
+void sendMessageBT(char** msg) {
+	Serial.print("Sending Message: ");
+	Serial.println(*msg);
+
+	SerialBT.write((const uint8_t*) *msg, strlen(*msg));
+	SerialBT.write(EOT_CHAR);		// append EOT character
+
+	// SerialBT library seems to require EOL to actually flush the write buffer
+	SerialBT.write('\r');
+	SerialBT.write('\n');
+}
+
+
+#include <ArduinoJson.h>
+
+
+void sendStructuredMessageBT(DynamicJsonDocument msg_doc) {
+	char* msg = (char*) malloc(sizeof(char) * MAX_MESSAGE_LENGTH);
+	serializeJson(msg_doc, msg, MAX_MESSAGE_LENGTH);
+
+	// Serial.print("Sending Structured Message: ");
+	// Serial.println(msg);
+	
+	sendMessageBT(&msg);
+
+	free(msg);
 }
