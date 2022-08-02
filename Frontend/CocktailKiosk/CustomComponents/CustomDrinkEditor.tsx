@@ -24,7 +24,6 @@ const IngredientSlider: React.FC<{drink: recipe, ing: ingredient, parts: number}
 
 	return (
 		<Slider
-			key={ing.name}
 			size="lg"
 			colorScheme="gray"
 			minValue={0} maxValue={maxPartsFound * 1.5}
@@ -60,7 +59,7 @@ export const CustomDrinkEditor: React.FC<{drink: recipe}> = ({
 			<DrinkChart drink={drink} height={350} width={225}/>
 			<VStack alignItems="center" w="300" space={8} marginTop={8}>
 				{drink.ingredients.slice(0).reverse().map(([ing, parts]) =>
-					<IngredientSlider drink={drink} ing={ing} parts={parts} />
+					<IngredientSlider drink={drink} ing={ing} parts={parts} key={ing.name} />
 				)}
 			</VStack>
 		</HStack>

@@ -112,14 +112,30 @@ class SizeButton extends Component<{text: string, subText: string, selected: boo
 
 
 export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootStackParamList, "Menu"> ) {
+	
+	const { BTManager, ingredientA, ingredientB, ingredientC, ingredientD, ingredientE, ingredientF } = useContext(AppContext)
 
 	const [selectedRecipeIndex, setSelectedRecipeIndex] = useState(0);
-	const [customDrink, setCustomDrink] = useState<recipe>(deepCopy(RECIPES[0]))
-	const [size, setSize] = useState("medium");
+
+	const haveIngredientsFor = (drink: recipe) => {
+		const installedIngredientNames = [ingredientA, ingredientB, ingredientC, ingredientD, ingredientE, ingredientF].map(i => i == null ? "EMPTY" : i.name)
+		console.log(installedIngredientNames)
+		return drink.ingredients.every(([ing, _]) => {
+			console.log(ing.name)
+			return installedIngredientNames.includes(ing.name)
+		})
+	}
+
+
+	const [availableRecipes, setAvailableRecipes] = useState(RECIPES.filter(r => haveIngredientsFor(r)))
+	console.log(availableRecipes.length)
+
+	const [customDrink, setCustomDrink] = useState<recipe>(deepCopy(availableRecipes[0]))
+	const [size, setSize] = useState<"small" | "medium" | "large">("medium");		// TODO: convert to ENUM type
 
 	const [showModal, setShowModal] = useState(false);
 
-	const { BTManager, ingredientA, ingredientB, ingredientC, ingredientD, ingredientE, ingredientF } = useContext(AppContext)
+
 
 	useEffect(() => {
 		BTManager.onRequestOrderStart = () => {
@@ -128,30 +144,28 @@ export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootSta
 			const total_size: number = DRINK_SIZES.get(size)
 			const total_parts: number =  customDrink.ingredients.reduce((partialSum, [_, parts]) => partialSum + parts, 0)
 
-			// TODO: make this more robust (loop the other way)
-			for (var i = 0; i < 6; i++) {
-				const targetIng: ingredient = [ingredientA, ingredientB, ingredientC, ingredientD, ingredientE, ingredientF][i]
-				
-				if (targetIng == null) {
-					continue
-				}
+			const missingIngredients: string[] = []
 
-				const entry = customDrink.ingredients.find(([ing, _]) => ing.name == targetIng.name)
-				console.log(customDrink)
-				console.log(entry)
+			customDrink.ingredients.forEach(([ing, parts]) => {
+				const index = [ingredientA, ingredientB, ingredientC, ingredientD, ingredientE, ingredientF].findIndex((installedIng) => installedIng && ing.name == installedIng.name)
 
-				var parts: number
-				if (entry == undefined) {
-					console.log(`Current drink selection does not include ${targetIng.name}`)
-					parts = 0
+				if (index == -1) {
+					missingIngredients.push(ing.name)
 				} else {
-					parts = entry[1]
+					ingredient_amounts[index] = total_size * (parts / total_parts)
 				}
-				
-				ingredient_amounts[i] = total_size * (parts / total_parts);
-			}
+			})
 
-			console.log(ingredient_amounts)
+			// console.log(ingredient_amounts)
+
+			if (missingIngredients.length > 0) {
+				if (missingIngredients.length == customDrink.ingredients.length) {
+					Toast.show({description: `ERROR: do not have any of the required ingredients installed`})
+					return
+				} else {
+					Toast.show({description: `WARNING: do not currently have ${missingIngredients.join(" or ")} installed. Making drink without...`})
+				}
+			}
 
 			BTManager.sendMessage({
 				message_type: "signal_order_start",
@@ -162,20 +176,35 @@ export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootSta
 		}
 	})
 
+	useEffect(() => {
+		BTManager.onNotifyOrderStarted = (message_content: {eta: number}) => {
+			navigation.navigate("Progress", {eta: message_content.eta})
+		}
+	})
+
 	const renderDrinkCard: ListRenderItem<recipe> = function({ item, index }) {
 		return (
 			<DrinkCard drink={item} selected={index === selectedRecipeIndex} onPressAction={() => {
 				setSelectedRecipeIndex(index)
-				setCustomDrink(deepCopy(RECIPES[index]))
+				setCustomDrink(deepCopy(availableRecipes[index]))
 			}}/>
 		)
 	}
+
+	const openModal = () => {
+		setShowModal(true)
+	}
+
+	const closeModal = () => {
+		setShowModal(false)
+	}
+
 
 	return (<>
 		<SafeAreaView>
 			<HStack height="100%">
 				<FlatList
-					data={RECIPES}
+					data={availableRecipes}
 					extraData={selectedRecipeIndex}
 					renderItem={renderDrinkCard}
 					keyExtractor={(item, index) => item.name + index}
@@ -191,7 +220,7 @@ export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootSta
 						borderRadius: 12,
 						padding: 8,
 					}}
-						onPress={() => setShowModal(true)}
+						onPress={openModal}
 					>
 						<Text fontSize="md" style={{"fontWeight": "300"}} color="black"> NEXT  〉</Text>
 					</TouchableOpacity>
@@ -229,7 +258,7 @@ export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootSta
 			</HStack>
 		</SafeAreaView>
 
-		<Modal isOpen={showModal} onClose={() => setShowModal(false)} size="full">
+		<Modal isOpen={showModal} onClose={closeModal} size="full">
 			<Modal.Content maxWidth="825px" minHeight="425px">
 				<Modal.CloseButton />
 				{/* <Modal.Header>Contact Us</Modal.Header> */}
@@ -258,20 +287,6 @@ export function MenuScreen({ route, navigation }: NativeStackScreenProps<RootSta
 						</VStack>
 					</HStack>
 				</Modal.Body>
-				{/* <Modal.Footer>
-					<Button.Group space={2}>
-						<Button variant="ghost" colorScheme="blueGray" onPress={() => {
-						setShowModal(false);
-					}}>
-							Cancel
-						</Button>
-						<Button onPress={() => {
-						setShowModal(false);
-					}}>
-							Save
-						</Button>
-					</Button.Group>
-				</Modal.Footer> */}
 			</Modal.Content>
 		</Modal>
 	</>);

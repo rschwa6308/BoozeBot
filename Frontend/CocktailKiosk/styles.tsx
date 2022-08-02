@@ -15,6 +15,6 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 32,
     borderRadius: 16,
     elevation: 3,
-    backgroundColor: "blue",
+    backgroundColor: "#CC9F76",
 	},
 });

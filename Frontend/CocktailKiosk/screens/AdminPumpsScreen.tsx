@@ -68,7 +68,7 @@ const ControlUnit: React.FC<ControlUnitProps> = ({
 
 
 
-
+// TODO: make this state persistent
 
 export function AdminPumpsScreen({ route, navigation }: NativeStackScreenProps<RootStackParamList, "AdminPumps"> ) {
 	const {

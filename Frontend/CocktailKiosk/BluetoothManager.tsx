@@ -28,6 +28,9 @@ export class BluetoothManager {
   onNotifyOrderFinished: CallableFunction
   onNotifyOrderCanceled: CallableFunction
 
+  lastReceivedMessage: string
+  lastReceviedTime: number
+
   constructor() {
     this.isEnabled = false
     this.devices = []
@@ -39,6 +42,9 @@ export class BluetoothManager {
     this.onNotifyOrderStarted = () => {}
     this.onNotifyOrderFinished = () => {}
     this.onNotifyOrderCanceled = () => {}
+
+    this.lastReceivedMessage = ""
+    this.lastReceviedTime = 0
   }
 
   initialize() {
@@ -69,10 +75,18 @@ export class BluetoothManager {
     })
     
     BluetoothSerial.on("read", (msg: any) => {
-      console.log("Received from PumpController: " + msg.data.trim())
-      Toast.show({description: `Message received from device:\n\n\"${msg.data.trim()}\"`})
-
-      this.handleMessage(JSON.parse(msg.data.trim().slice(0, -1)))
+      // ESP module seems to send duplicate messages for some reason (e.g. 6 copies of the exact same thing)
+      // to avoid handling them all, only handle an incoming message if it's new or enough time has passed
+      const now = Date.now()
+      if (msg.data != this.lastReceivedMessage || now - this.lastReceviedTime > 100) {
+        console.log("Received from PumpController: " + msg.data.trim())
+        // Toast.show({description: `Message received from device:\n\n\"${msg.data.trim()}\"`})
+        
+        this.lastReceivedMessage = msg.data
+        this.lastReceviedTime = now
+        
+        this.handleMessage(JSON.parse(msg.data.trim().slice(0, -1)))
+      }
     })
   }
 
@@ -131,7 +145,7 @@ export class BluetoothManager {
         break;
       
         case "notify_order_started":
-          this.onNotifyOrderStarted()
+          this.onNotifyOrderStarted(message.message_content)
           break;
         
         case "notify_order_finished":

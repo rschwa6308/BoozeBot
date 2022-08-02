@@ -16,11 +16,12 @@ import { AdminMenuScreen } from "./screens/AdminMenuScreen";
 import { AdminPumpsScreen } from "./screens/AdminPumpsScreen";
 import { AdminBluetoothScreen } from "./screens/AdminBluetoothScreen";
 
-import { ingredient } from "./recipes/recipes";
+import { ingredient, INGREDIENT_LOOKUP } from "./recipes/recipes";
 import { AppContext } from "./AppContext";
 import { StatusBar } from "react-native";
 import { theme } from "./theme"
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 import { BluetoothManager, PUMP_CONTROLLER_DEVICE } from "./BluetoothManager";
@@ -31,7 +32,7 @@ import { BluetoothManager, PUMP_CONTROLLER_DEVICE } from "./BluetoothManager";
 export type RootStackParamList = {
 	Home: undefined
 	Menu: undefined
-	Progress: undefined
+	Progress: {eta: number}
 	AdminMenu: undefined
 	AdminPumps: undefined
 	AdminBluetooth: undefined
@@ -42,11 +43,35 @@ const RootStack = createNativeStackNavigator();
 
 
 const customFonts = {
-  "Baskerville-Regular": require("./assets/fonts/Libre_Baskerville/LibreBaskerville-Regular.ttf"),
-  "Baskerville-Italic": require("./assets/fonts/Libre_Baskerville/LibreBaskerville-Italic.ttf"),
-  "Baskerville-Bold": require("./assets/fonts/Libre_Baskerville/LibreBaskerville-Bold.ttf"),
-  "Baskerville-BoldItalic": require("./assets/fonts/Baskerville_Bold_Italic/Baskerville_Bold_Italic.otf"),
+	"Baskerville-Regular": require("./assets/fonts/Libre_Baskerville/LibreBaskerville-Regular.ttf"),
+	"Baskerville-Italic": require("./assets/fonts/Libre_Baskerville/LibreBaskerville-Italic.ttf"),
+	"Baskerville-Bold": require("./assets/fonts/Libre_Baskerville/LibreBaskerville-Bold.ttf"),
+	"Baskerville-BoldItalic": require("./assets/fonts/Baskerville_Bold_Italic/Baskerville_Bold_Italic.otf"),
 };
+
+
+
+const storeData = async (key: string, value: string) => {
+	try {
+		await AsyncStorage.setItem(key, value)
+	} catch (e) {
+		console.log("Error while saving data:", e)
+	}
+}
+
+
+const getData = async (key: string) => {
+	try {
+		const value = await AsyncStorage.getItem(key)
+		if (value !== null) {
+			return value
+		} else {
+			return undefined
+		}
+	} catch(e) {
+		console.log("Error while reading data:", e)
+	}
+}
 
 
 
@@ -58,6 +83,56 @@ export default function App() {
 	const [ingredientD, setIngredientD] = useState<ingredient | null>(null)
 	const [ingredientE, setIngredientE] = useState<ingredient | null>(null)
 	const [ingredientF, setIngredientF] = useState<ingredient | null>(null)
+	
+	// reading from persistent storage
+	useEffect(() => {
+		getData("@ingredientA").then((val) => {
+			setIngredientA(val == undefined ? null : INGREDIENT_LOOKUP(val))
+			console.log("read value for ingredientA:", val)
+		})
+		getData("@ingredientB").then((val) => {
+			setIngredientB(val == undefined ? null : INGREDIENT_LOOKUP(val))
+		})
+		getData("@ingredientC").then((val) => {
+			setIngredientC(val == undefined ? null : INGREDIENT_LOOKUP(val))
+		})
+		getData("@ingredientD").then((val) => {
+			setIngredientD(val == undefined ? null : INGREDIENT_LOOKUP(val))
+		})
+		getData("@ingredientE").then((val) => {
+			setIngredientE(val == undefined ? null : INGREDIENT_LOOKUP(val))
+		})
+		getData("@ingredientF").then((val) => {
+			setIngredientF(val == undefined ? null : INGREDIENT_LOOKUP(val))
+		})
+	}, [])
+
+	// writing to persistent storage (event listeners)
+	useEffect(() => {
+		console.log("ingredientA has changed")
+		storeData("@ingredientA", ingredientA == null ? "EMPTY" : ingredientA.name)
+	}, [ingredientA])
+	useEffect(() => {
+		console.log("ingredientB has changed")
+		storeData("@ingredientB", ingredientB == null ? "EMPTY" : ingredientB.name)
+	}, [ingredientB])
+	useEffect(() => {
+		console.log("ingredientC has changed")
+		storeData("@ingredientC", ingredientC == null ? "EMPTY" : ingredientC.name)
+	}, [ingredientC])
+	useEffect(() => {
+		console.log("ingredientD has changed")
+		storeData("@ingredientD", ingredientD == null ? "EMPTY" : ingredientD.name)
+	}, [ingredientD])
+	useEffect(() => {
+		console.log("ingredientE has changed")
+		storeData("@ingredientE", ingredientE == null ? "EMPTY" : ingredientE.name)
+	}, [ingredientE])
+	useEffect(() => {
+		console.log("ingredientF has changed")
+		storeData("@ingredientF", ingredientF == null ? "EMPTY" : ingredientF.name)
+	}, [ingredientF])
+
 
 	const [BTManager, _] = useState(new BluetoothManager())
 
@@ -73,15 +148,14 @@ export default function App() {
 	}, [])
 
 	// ensure bluetooth connection every few seconds
-	// TODO: figure out why this isn't actually running
 	useEffect(() => {
-    const interval = setInterval(() => {
+		const interval = setInterval(() => {
 			if (!(BTManager.connected || BTManager.connecting)) {
 				// console.log("Attempting to connect")
 				BTManager.connect(PUMP_CONTROLLER_DEVICE)
 			}
 		}, 5000);
-  }, []);
+	}, []);
 
 	// load fonts
 	let [fontsLoaded] = useFonts(customFonts);
@@ -89,8 +163,8 @@ export default function App() {
 	// TODO: figure out why the heck native-base won't apply the custom font
 
 	if (!fontsLoaded) {
-    return <AppLoading />;
-  } else {
+		return <AppLoading />;
+	} else {
 		return (
 			<NativeBaseProvider theme={theme}>
 				<SafeAreaProvider>
@@ -104,7 +178,23 @@ export default function App() {
 						BTManager
 					}}>
 						<NavigationContainer>
-							<RootStack.Navigator screenOptions={{ headerShown: false }}>
+							<RootStack.Navigator
+								screenOptions={{ headerShown: false }}
+								screenListeners={{
+									state: (e) => {
+										// Do something with the state
+										const new_screen_name = e.data.state.routes[e.data.state.index].name
+										console.log("Screen Changed:", new_screen_name);
+
+										BTManager.sendMessage({
+											message_type: "notify_UI_state",
+											message_content: {
+												UI_state: new_screen_name == "Menu" ? "order_confirmed" : "other"
+											}
+										})
+									},
+								}}
+							>
 								<RootStack.Screen name="Home" component={HomeScreen} />
 								<RootStack.Screen name="Menu" component={MenuScreen} />
 								<RootStack.Screen name="Progress" component={ProgressScreen} />

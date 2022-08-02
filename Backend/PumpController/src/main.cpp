@@ -53,6 +53,8 @@ bool currentlyHandlingOrder;	// flag that indicates if an order is currently bei
 long currentOrderStartTime;		// time that the current order started (measured in milliseconds)
 int currentOrder[6];			// array that keeps track of how long each pump should be run (measured in milliseconds)
 
+bool kiosk_order_confirmed;		// flag that indicates when the kiosk is in a "order confirmed" state
+
 
 void setup() {
 	Serial.begin(115200);
@@ -81,39 +83,69 @@ void setup() {
 
 
 void handleButtons() {
-	// TODO: create a queue for button input events
-
 	greenButtonPressed = digitalRead(GREEN_BUTTON) == LOW;
 	redButtonPressed = digitalRead(RED_BUTTON) == LOW;
 	
 	if (!greenButtonOld && greenButtonPressed) {
 		Serial.print("GREEN BUTTON DOWN\n");
+		digitalWrite(GREEN_LED, HIGH);		// DEBUG
 		
-		// digitalWrite(GREEN_LED, HIGH);
-		
-		// send REQUEST_ORDER_START message
-		DynamicJsonDocument doc(1024);
-		doc["message_type"] = "request_order_start";
-		doc["message_content"] = "";	// no content
-		sendStructuredMessageBT(doc);
+		// send REQUEST_ORDER_START message if kiosk is ready for it
+		if (kiosk_order_confirmed) {
+			DynamicJsonDocument doc(1024);
+			doc["message_type"] = "request_order_start";
+			doc["message_content"] = "";	// no content
+			sendStructuredMessageBT(doc);
+		}
 	}
 
 	if (greenButtonOld && !greenButtonPressed) {
 		Serial.print("GREEN BUTTON UP\n");
-		// digitalWrite(GREEN_LED, LOW);
+		digitalWrite(GREEN_LED, LOW);		// DEBUG
 	}
 
 	if (!redButtonOld && redButtonPressed) {
 		Serial.print("RED BUTTON DOWN\n");
-		// digitalWrite(RED_LED, HIGH);
+		digitalWrite(RED_LED, HIGH);		// DEBUG
+
+		// cancel order
+		currentlyHandlingOrder = false;
+		for (int i = 0; i < 6; i++) {
+			// SHUT IT DOWN!!!
+			digitalWrite(getRelayChannelPin(i + 1), LOW);
+		}
+
+		// send notification to kiosk
+		DynamicJsonDocument doc(1024);
+		doc["message_type"] = "notify_order_canceled";
+		doc["message_content"] = "";	// no content
+		sendStructuredMessageBT(doc);
 	}
 
 	if (redButtonOld && !redButtonPressed) {
 		Serial.print("RED BUTTON UP\n");
+		digitalWrite(RED_LED, LOW);			// DEBUG
+
 	}
 
 	greenButtonOld = greenButtonPressed;
 	redButtonOld = redButtonPressed;
+
+
+	// handle button LED states
+	digitalWrite(GREEN_LED, kiosk_order_confirmed ? HIGH : LOW);
+	digitalWrite(RED_LED, currentlyHandlingOrder ? HIGH : LOW);
+}
+
+
+int getMakespan(const int ingredientAmounts[6]) {
+	int max = -1;
+	for (int i = 0; i < 6; i++) {
+		if (ingredientAmounts[i] > max) {
+			max = ingredientAmounts[i];
+		}
+	}
+	return max;
 }
 
 
@@ -155,6 +187,13 @@ void handleMessage(char* msg) {
 				digitalWrite(getRelayChannelPin(i + 1), HIGH);
 			}
 		}
+
+		// send notification to kiosk
+		DynamicJsonDocument doc(1024);
+		JsonObject message_content = doc.createNestedObject("message_content");
+		doc["message_type"] = "notify_order_started";
+		message_content["eta"] = getMakespan(currentOrder);
+		sendStructuredMessageBT(doc);
 	}
 	
 	else if (strcmp(msg_type, "signal_manual_control") == 0) {
@@ -163,6 +202,17 @@ void handleMessage(char* msg) {
 
 		Serial.printf("Manual Control Signal: turning pump #%d %s\n", pumpNumber, newState ? "ON" : "OFF");
 		digitalWrite(getRelayChannelPin(pumpNumber), newState ? HIGH : LOW);
+	}
+
+	else if (strcmp(msg_type, "notify_UI_state") == 0) {
+		const char* UIState = doc["message_content"]["UI_state"];
+		if (strcmp(UIState, "order_confirmed") == 0) {
+			kiosk_order_confirmed = true;
+		} else {
+			kiosk_order_confirmed = false;
+		}
+		Serial.print("kiosk_order_confirmed: ");
+		Serial.println(kiosk_order_confirmed ? "true" : "false");
 	}
 	
 	else {
@@ -201,7 +251,12 @@ void handleOrder() {
 	if (orderFinished) {
 		Serial.println("ORDER FINISHED!!!");
 		currentlyHandlingOrder = false;
-		// TODO: send notification to kiosk
+
+		// send notification to kiosk
+		DynamicJsonDocument doc(1024);
+		doc["message_type"] = "notify_order_finished";
+		doc["message_content"] = "";	// no content
+		sendStructuredMessageBT(doc);
 	}
 }
 
@@ -218,7 +273,12 @@ void loop() {
 	// if there is a message waiting, consume and handle it
 	if (messageWaitingBT()) {
 		char** msg_ptr = getMessageBT();
-		handleMessage(*msg_ptr);
+		try {
+			handleMessage(*msg_ptr);
+		}
+		catch (...) {
+			Serial.println("ERROR: an error occurred while handling message");
+		}
 	}
 
 	delay(10);			// wait a few milliseconds
