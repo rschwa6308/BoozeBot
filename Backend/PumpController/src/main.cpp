@@ -281,6 +281,11 @@ void loop() {
 		}
 	}
 
+	// turn off green LED if not connected at all
+	if (!connectedBT()) {
+		kiosk_order_confirmed = false;
+	}
+
 	delay(10);			// wait a few milliseconds
 }
 

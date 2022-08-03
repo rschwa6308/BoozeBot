@@ -58,7 +58,7 @@ export function ProgressScreen({ route, navigation }: NativeStackScreenProps<Roo
 					!orderFinished ? 
 				
 					<VStack space={20} alignContent="center" justifyContent="center">
-						<Heading fontSize="4xl">Making your drink! Time remaining:</Heading>
+						<Heading fontSize="5xl">Making your drink! Time remaining:</Heading>
 						<Text fontSize="5xl" bold>about {Math.round(timeRemaining/1000)} seconds</Text>
 					</VStack>
 

@@ -58,6 +58,11 @@ void loopBT() {
 }
 
 
+bool connectedBT() {
+	return SerialBT.connected(5);
+}
+
+
 boolean messageWaitingBT() {
 	return !messageQueue.isEmpty();
 }
